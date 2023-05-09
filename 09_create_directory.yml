@@ -1,0 +1,22 @@
+---
+# Create Directory that App use
+# 
+
+- name: Create Directory that App use
+  hosts: sample-vm
+  remote_user: root
+  become: true
+  become_method: sudo
+
+  tasks:
+    - name: Create directory
+      file:
+        path: '{{ item }}'
+        owner: docker
+        group: docker
+        mode: '0755'
+        state: directory
+      with_items:
+      - /srv/apps
+      - /srv/packages
+      - /srv/logs

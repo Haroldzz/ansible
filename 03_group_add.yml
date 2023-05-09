@@ -1,0 +1,19 @@
+---
+# This is a demo of how the group command works.
+
+- hosts: sample-vm
+  remote_user: root
+  become: true
+  become_method: sudo
+
+  tasks:
+
+    # Walk through group creation, modification, and deletion
+    - name: create a group
+      group: name=docker gid=1000 state=present
+
+    # You can only modify the group's gid
+    #- group: name=docker gid=1000
+
+    # And finally add the group
+    #- group: name=docker state=present

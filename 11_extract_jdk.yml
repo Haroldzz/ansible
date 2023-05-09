@@ -1,0 +1,15 @@
+---
+# Extract jdk.tgz into /srv
+# 
+
+- name: Extract jdk.tgz into /srv
+  hosts: social-vm-app
+  remote_user: root
+  become: true
+  become_method: sudo
+
+  tasks:
+    - name: Extract apps.tgz into /srv
+      unarchive:
+        src: jdk1.8.0_181.tgz
+        dest: /srv

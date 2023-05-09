@@ -1,0 +1,32 @@
+---
+# this is a demo of how the user commands work and how to reference salted passwords
+# in vars sections.  You could also use vars_files if you like (see other examples)
+
+- hosts: sample-vm
+  remote_user: root
+  become: true
+  become_method: sudo
+
+  vars:
+    # created with:
+    # python -c 'import crypt; print crypt.crypt("This is my Password", "$1$SomeSalt$")'
+    # password: $6$vAJMrWYEz2y/hRHA$7Jl8BZ9SxUjkGYH.2LVT09el8ljf1yWfzQrdVV.dQ/jveb7tckIYsgu91kJ4xjDtDHRiC1By5wLPH4y.hP1J9/
+    # python -c 'import crypt; print crypt.crypt("Hi2QVESg", "$6$vAJMrWYEz2y/hRHA$")'
+    # python -c 'import crypt; print crypt.crypt("XFahQJTy", "$6$ydzZY7LLYVaQENC5$")'
+    p1415926: $6$vAJMrWYEz2y/hRHA$7Jl8BZ9SxUjkGYH.2LVT09el8ljf1yWfzQrdVV.dQ/jveb7tckIYsgu91kJ4xjDtDHRiC1By5wLPH4y.hP1J9/
+
+  tasks:
+
+    # Walk through account creation, modification, and deletion
+    # - name: docker user account creation
+    #  user: name=docker uid=1000 password={{password}} comment=dockerUser group=docker shell=/bin/bash createhome=yes state=present
+    - name: docker user account creation
+      user:
+        name: docker
+        uid: 1000
+        password: "{{ p1415926 }}"
+        comment: "Docker User"
+        group: docker
+        shell: /bin/bash
+        createhome: yes
+        state: present

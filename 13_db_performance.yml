@@ -1,0 +1,33 @@
+---
+# This playbook will turn database
+- name: Install nrpe package
+  hosts: sample-vm
+  remote_user: root
+  become: true
+  become_method: sudo
+
+  tasks:
+    #- name: turning performance of database
+
+    - name: copy configuration file to /usr/lib/sysctl.d/
+      copy:
+        src: database.conf
+        dest: /usr/lib/sysctl.d/20-database.conf
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: performance of database
+      lineinfile:
+        dest: /etc/rc.d/rc.local
+        owner: root
+        group: root
+        mode: 0755
+        state: present
+        line: '{{ item }}'
+      with_items:
+        - '# performance of database service'
+        - 'echo never > /sys/kernel/mm/transparent_hugepage/enabled'
+        - 'echo never > /sys/kernel/mm/transparent_hugepage/defrag'
+      tags:
+        - db

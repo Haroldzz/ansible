@@ -1,0 +1,22 @@
+---
+# Install Base Tools on CentOS
+# 
+
+- name: Install Base Tools on CentOS
+  hosts: sample-vm
+  remote_user: root
+  become: true
+  become_method: sudo
+
+  tasks:
+    #- name: Upgrade all packages
+    #  yum: name=* state=latest
+    - name: Install the latest version of epel-release
+      yum:
+        name: ['epel-release']
+        state: latest
+
+    - name: Install the latest version of some base tools
+      yum:
+        name: ['rsync', 'git', 'nfs-utils', 'sysstat', 'iptraf-ng', 'lsof', 'htop', 'nc', 'tcpdump']
+        state: latest

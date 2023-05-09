@@ -1,0 +1,11 @@
+---
+#
+#
+
+- hosts: sample-vm
+  remote_user: root
+  become: true
+  become_method: su
+
+  tasks:
+    - ping:

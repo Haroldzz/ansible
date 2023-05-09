@@ -1,0 +1,20 @@
+---
+#
+#
+
+- hosts: sample-vm
+  remote_user: root
+  become: true
+  become_method: su
+
+  tasks:
+    - shell: ip add list | awk -F "[./]" '/10.19/ { print "vm"$3"-"$4}'
+      register: vmname
+    - set_fact: var1="{{vmname.stdout}}"
+    - name: modify hostname
+      replace:
+        dest: /etc/hostname
+        regexp: '^localhost'
+        replace: '{{ var1 }}'
+      tags:
+        - hostname

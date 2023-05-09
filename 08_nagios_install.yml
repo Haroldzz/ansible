@@ -1,0 +1,36 @@
+---
+# This playbook will install nrpe.
+- name: Install nrpe package
+  hosts: sample-vm
+  remote_user: root
+  become: true
+  become_method: sudo
+
+  tasks:
+    #- name: Upgrade all packages
+    #  yum: name=* state=latest
+
+    - name: Check if nrpe is installed
+      command: systemctl status nrpe
+      register: nrpe_check
+      ignore_errors: yes
+
+    - name: Install the latest version of nrpe
+      yum:
+        name: ['epel-release', 'nrpe', 'nagios-plugins-all', 'openssl']
+        state: latest
+
+    - name: copy nrpe to etc/nagios
+      copy:
+        src: nrpe.cfg
+        dest: /etc/nagios
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Enable the Nrpe daemon in systemd
+      systemd:
+        name: nrpe
+        enabled: yes
+        state: restarted
+        masked: no

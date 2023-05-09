@@ -1,0 +1,88 @@
+---
+# Install Docker and Docker Compose on CentOS
+# 
+
+- name: Install Docker and Docker Compose on CentOS
+  hosts: sample-vm
+  remote_user: root
+  become: true
+  become_method: sudo
+
+  tasks:
+    #- name: Upgrade all packages
+    #  yum: name=* state=latest
+
+    - name: Check if Docker is installed
+      command: systemctl status docker
+      register: docker_check
+      ignore_errors: yes
+
+    - name: Download the Docker installer
+      get_url:
+        url: https://get.docker.com/
+        dest: /tmp/get-docker.sh
+        mode: 0700
+      when: docker_check.stderr.find('service could not be found') != -1
+
+    - name: Install Docker
+      shell: /tmp/get-docker.sh
+      when: docker_check.stderr.find('service could not be found') != -1
+
+    - name: Remove the Docker installer file.
+      file:
+        state: absent
+        path: /tmp/get-docker.sh
+
+    - name: Create directory named /srv/docker
+      file:
+        path: /srv/docker
+        state: directory
+        mode: 0711
+    
+    - name: Create a symbolic link used by docker
+      file:
+        src: /srv/docker/
+        dest: /var/lib/docker
+        owner: root
+        group: root
+        state: link
+        
+    - name: Enable the Docker daemon in systemd
+      systemd:
+        name: docker
+        enabled: yes
+        masked: no
+
+    - name: Start the Docker daemon
+      systemd:
+        name: docker
+        state: started
+        masked: no
+
+    - name: Check if Docker Compose is installed
+      command: docker-compose --version
+      register: docker_compose_check
+      ignore_errors: yes
+
+    - name: Install the latest version of epel-release
+      yum:
+        name: ['epel-release']
+        state: latest
+
+    - name: Install the latest version of pip and pyOpenSSL
+      yum:
+        name: ['pyOpenSSL', 'python2-pip']
+        state: latest
+
+    - name: Install urllib3 ndg-httpsclient pyasn1 using Ansible pip module
+      pip:
+        name: urllib3,ndg-httpsclient,pyasn1
+
+    - name: Download and install Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.24.1/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: 0755
+      when:
+        - docker_compose_check.msg is defined
+        - docker_compose_check.msg.find('No such file or directory') != -1

@@ -1,0 +1,29 @@
+---
+#
+#
+
+- hosts: sample-vm
+  remote_user: root
+  become: true
+  become_method: su
+
+  tasks:
+    - name: deny ssh
+      lineinfile:
+        dest: /etc/hosts.deny
+        state: present
+        regexp: '^sshd'
+        line: 'sshd : ALL'
+    - name: allow ssh
+      lineinfile:
+        dest: /etc/hosts.allow
+        state: present
+        line: '{{ item }}'
+      with_items:
+        - 'sshd : 1.1.1.1/32'
+        - 'sshd : 3.3.3.3/32'
+        - 'sshd : 10.0.0.0/8'
+        - 'sshd : 172.16.0.0/12'
+        - 'sshd : 192.168.0.0/16'
+      tags:
+        - sshd

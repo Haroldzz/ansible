@@ -1,0 +1,18 @@
+---
+#
+#
+
+- hosts: sample-vm
+  remote_user: root
+  become: true
+  become_method: su
+
+  tasks:
+    - name: setup dns
+      lineinfile:
+        dest: /etc/resolv.conf
+        state: present
+        regexp: '^nameserver'
+        line: 'nameserver 180.76.76.76'
+      tags:
+        - dns

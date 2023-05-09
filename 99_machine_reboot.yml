@@ -1,0 +1,14 @@
+---
+# Reboot machine
+# 
+
+- name: Reboot machine
+  hosts: sample-vm
+  remote_user: root
+  become: true
+  become_method: sudo
+
+  tasks:
+    - name: Reboot machine after 5s
+      reboot:
+        reboot_timeout: 5

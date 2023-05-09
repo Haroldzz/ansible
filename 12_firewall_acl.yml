@@ -1,0 +1,35 @@
+---
+# Update to adjust for duplicate ports
+#
+
+- name: add duplicate port with different protocol
+  hosts: sample-vm
+  remote_user: root
+  become: true
+  become_method: sudo
+
+  tasks:
+    - name: add duplicate port with different protocol
+      firewalld:
+        port: "{{ item.port }}/{{ item.protocol }}"
+        permanent: "{{ item.persist if item.persist is defined else 'true' }}"
+        state: "{{ item.state if item.state is defined else 'enabled' }}"
+        zone: "{{ item.zone if item.zone is defined else 'public' }}"
+      with_items:
+      - { port: '80', protocol: 'tcp' }
+      - { port: '443', protocol: 'tcp' }
+      - { port: '4000', protocol: 'tcp' }
+      - { port: '5666', protocol: 'tcp' }
+      - { port: '6379', protocol: 'tcp' }
+      - { port: '9000', protocol: 'tcp' }
+      - { port: '9200', protocol: 'tcp' }
+      - { port: '9300', protocol: 'tcp' }
+      - { port: '27017', protocol: 'tcp' }
+      - { port: '8000-9000', protocol: 'tcp' }
+      - { port: '18000-19000', protocol: 'tcp' }
+      - { port: '5671-5672', protocol: 'tcp' }
+      - { port: '15671-15672', protocol: 'tcp' }
+      - { port: '25671-25672', protocol: 'tcp' }
+
+    - name: firewalld reload
+      command: firewall-cmd --reload
